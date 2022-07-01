@@ -1,0 +1,13 @@
+GET http://127.0.0.1:81
+
+###
+
+POST http://127.0.0.1:81 HTTP/1.1
+content-type: application/json
+{ 
+    "_id": 2,
+    "rigID": 1,
+    "deviceID": 1,
+    "sensorData": "Faulty",
+    "timeStamp": "2022-06-27T15:00:00Z" 
+}

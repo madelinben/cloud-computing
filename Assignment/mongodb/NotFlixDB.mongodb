@@ -1,0 +1,24 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('NotFlixDB');
+
+// The drop() command destroys all data from a collection.
+db.data.drop();
+
+// Insert a few documents into the user interaction collection.
+db.data.insertMany([
+  { '_id': 1, 'accountID': 1, 'userName': 'madelinben', 'titleID': 1, 'userAction': 'Play', 'dateTime': '2022-06-26T12:35:00Z', 'pointOfInteraction': '2022-06-26T12:35:00Z', 'typeOfInteraction': 'Played'  },
+  { '_id': 2, 'accountID': 2, 'userName': 'JamesBond007', 'titleID': 2, 'userAction': 'Paused', 'dateTime': '2022-06-26T12:35:00Z', 'pointOfInteraction': '2022-06-26T12:35:00Z', 'typeOfInteraction': 'Paused'  },
+  { '_id': 3, 'accountID': 3, 'userName': 'bruceWayne', 'titleID': 3, 'userAction': 'Stop', 'dateTime': '2022-06-26T12:35:00Z', 'pointOfInteraction': '2022-06-26T12:35:00Z', 'typeOfInteraction': 'Stopped'  }
+]);
+
+use('NotFlixDB');
+db.getCollection('data').find({},{
+  accountID: 1
+}).sort({
+  accountID: 1
+});

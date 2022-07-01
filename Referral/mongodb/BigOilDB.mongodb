@@ -1,0 +1,16 @@
+use('BigOilDB');
+db.data.drop();
+db.data.insertMany([ 
+  { '_id': 1, 'rigID': 1, 'deviceID': 1, 'sensorData': 'Working', 'timeStamp': '2022-06-27T12:35:00Z' },
+  { '_id': 2, 'rigID': 1, 'deviceID': 1, 'sensorData': 'Faulty', 'timeStamp': '2022-06-27T15:00:00Z' }, 
+  { '_id': 3, 'rigID': 5, 'deviceID': 10, 'sensorData': 'Working', 'timeStamp': '2022-06-27T15:15:00Z' }, 
+  { '_id': 4, 'rigID': 5, 'deviceID': 10, 'sensorData': 'Working', 'timeStamp': '2022-06-27T15:35:00Z' }, 
+  { '_id': 5, 'rigID': 1, 'deviceID': 1, 'sensorData': 'Working', 'timeStamp': '2022-06-27T16:30:00Z' },
+]);
+
+use('BigOilDB');
+db.getCollection('data').find({},{
+  accountID: 1
+}).sort({
+  accountID: 1
+});

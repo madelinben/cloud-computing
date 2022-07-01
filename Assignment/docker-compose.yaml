@@ -1,0 +1,156 @@
+version: "3"
+services:
+# MongoDB
+  mongo1:
+    hostname: mongo1
+    container_name: localmongo1
+    image: mongo:4.0-xenial
+    ports:
+      - "40001:27017"
+      - "27017:27017"
+    networks:
+      - nodejs 
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  mongo2:
+    hostname: mongo2
+    container_name: localmongo2
+    image: mongo:4.0-xenial
+    ports:
+      - "40002:27017"
+    networks:
+      - nodejs 
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  mongo3:
+    hostname: mongo3
+    container_name: localmongo3
+    image: mongo:4.0-xenial
+    ports:
+      - "40003:27017"
+    networks:
+      - nodejs 
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  mongosetup:
+    image: mongo:4.0-xenial
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - ./scripts:/scripts
+    restart: "no"
+    entrypoint: [ "bash", "/scripts/mongo_setup.sh"]
+# Server Nodes
+  node1:
+    build: ./nodejs
+    hostname: app1
+    container_name: "AppNode1"
+    ports:
+      - "81:3000"
+    networks:
+      - nodejs
+    volumes:
+      - ./nodejs/src:/usr/src/app/
+  node2:
+    build: ./nodejs
+    hostname: app2
+    container_name: "AppNode2"
+    networks:
+      - nodejs
+    ports:
+      - "82:3000"
+    volumes:
+      - ./nodejs/src:/usr/src/app/
+  node3:
+    build: ./nodejs
+    hostname: app3
+    container_name: "AppNode3"
+    networks:
+      - nodejs
+    ports:
+      - "83:3000"
+    volumes:
+      - ./nodejs/src:/usr/src/app/
+# Server Load Balancer
+  nginx:
+    build: ./nginx
+    container_name: "NGINX"
+    ports:
+      - "80:80"
+    networks:
+      - nodejs 
+    depends_on:
+      - node1
+      - node2
+      - node3
+# Message Service Nodes
+  rabbitmq-stats:
+    image: bitnami/rabbitmq:3.8.14
+    container_name: rabbitmq-stats
+    volumes:
+      - rabbitmq-stats-data:/bitnami
+    environment:
+      - RABBITMQ_NODE_TYPE=stats
+      - RABBITMQ_NODE_NAME=rabbitmq@rabbitmq-stats
+      - RABBITMQ_ERL_COOKIE=password
+    ports:
+      - "50001:15672"
+    networks:
+      - nodejs 
+  rabbitmq-queue-one:
+    image: bitnami/rabbitmq:3.8.14
+    container_name: rabbitmq-queue-one
+    depends_on:
+      - rabbitmq-stats
+    volumes:
+      - rabbitmq-queue-one-data:/bitnami
+    environment:
+      - RABBITMQ_NODE_TYPE=queue-disc
+      - RABBITMQ_NODE_NAME=rabbitmq@rabbitmq-queue-one
+      - RABBITMQ_CLUSTER_NODE_NAME=rabbitmq@rabbitmq-stats
+      - RABBITMQ_ERL_COOKIE=password
+    networks:
+      - nodejs 
+  rabbitmq-queue-two:
+    image: bitnami/rabbitmq:3.8.14
+    container_name: rabbitmq-queue-two
+    depends_on:
+      - rabbitmq-stats
+    volumes:
+      - rabbitmq-queue-two-data:/bitnami
+    environment:
+      - RABBITMQ_NODE_TYPE=queue-disc
+      - RABBITMQ_NODE_NAME=rabbitmq@rabbitmq-queue-two
+      - RABBITMQ_CLUSTER_NODE_NAME=rabbitmq@rabbitmq-stats
+      - RABBITMQ_ERL_COOKIE=password
+    networks:
+      - nodejs
+# Message Service Load Balancer
+  haproxy: 
+    image: haproxy:1.7 
+    volumes: 
+      - ./rabbitmq/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro 
+    depends_on: 
+      - rabbitmq-stats 
+      - rabbitmq-queue-one
+      - rabbitmq-queue-two
+    ports: 
+      - 15672:15672
+      - 5672:5672
+    networks:
+      - nodejs 
+# Data Volumes
+volumes:
+  rabbitmq-stats-data:
+    driver: local
+  rabbitmq-queue-one-data:
+    driver: local
+  rabbitmq-queue-two-data:
+    driver: local
+# Network
+networks:
+  nodejs:
+    driver: bridge
+    

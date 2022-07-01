@@ -1,0 +1,16 @@
+GET http://127.0.0.1:81
+
+###
+
+POST http://127.0.0.1:81 HTTP/1.1
+content-type: application/json
+{
+    "_id": 4,
+    "accountID": 1,
+    "userName": "madelinben",
+    "titleID": 4,
+    "userAction": "Play",
+    "dateTime": "2022-06-26T12:35:00Z",
+    "pointOfInteraction": "2022-06-26T12:35:00Z",
+    "typeOfInteraction": "Played"
+}

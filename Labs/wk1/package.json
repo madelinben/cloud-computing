@@ -1,0 +1,24 @@
+{
+    "name": "cloud-computing",
+    "version": "1.0.0",
+    "description": "Cloud web service utilising virtualisation and load balancing strategies on a RESTful API to distribute a large scale application.",
+    "main": "test.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+       "start": "node test.js"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/madelinben/cloud-computing.git"
+    },
+    "author": "Benjamin Madelin",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/madelinben/cloud-computing/issues"
+    },
+    "homepage": "https://github.com/madelinben/cloud-computing#readme",
+    "dependencies": {
+      "express": "^4.17.1"
+    }
+  }
+  
